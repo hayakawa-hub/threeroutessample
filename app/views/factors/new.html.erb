@@ -11,23 +11,64 @@
 
 
 <script type="text/javascript">
-var placesList;
 
-/*
- お店情報取得
-*/
-window.onload=function getPlaces(){
-  
+var content =["小牧市小松寺2丁目52番地","映画館","和食","小牧市小松寺2丁目52"]
+
+var destinationplace="小牧市小松寺2丁目52番地"
+
+var counter = 1;
+
+var addressInput=0
+var selectedplace=0
+
+var placesList=[]
+
+var totalduration=[]
+var totaldistance=[]
+
+
+
+
+
+
+window.onload=function route(){
+
+
+
+
+
+
+counter=1;
+totalduration= new Array();
+
+totaldistance= new Array();
+
+
+addressInput=content[0]
+selectedplace=content[0]
+
+
+
+
+  for(var i=0; i<content.length-1;i++){
+    if(i<content.length-2){
+      getPlaces();
+    }else{
+      finalRoute();
+
+    }
+  }
+}
+
+
+function getPlaces(){
   //結果表示クリア
+
   document.getElementById("results").innerHTML = "";
   //placesList配列を初期化
   placesList = new Array();
   
-  //入力した検索場所を取得
-  var addressInput = "小牧市小松寺2丁目52";
-  if (addressInput == "") {
-    return;
-  }
+
   
   //検索場所の位置情報を取得
   var geocoder = new google.maps.Geocoder();
@@ -46,10 +87,8 @@ window.onload=function getPlaces(){
     });
 }
 
-/*
- 位置情報を使って周辺検索
-  latLng : 位置座標（google.maps.LatLng）
-*/
+
+
 function startNearbySearch(latLng){
   
   //読み込み中表示
@@ -64,7 +103,11 @@ function startNearbySearch(latLng){
   var service = new google.maps.places.PlacesService(map);
   
   //入力したKeywordを取得
-  var keywordInput = "和食";
+  var keywordInput = content[counter];
+  console.log(keywordInput)
+
+
+  counter+=1
   
   //周辺検索
   service.nearbySearch(
@@ -77,6 +120,9 @@ function startNearbySearch(latLng){
     getRoute
   );
 }
+
+
+
 
 function getRoute(results,status){
 
@@ -100,30 +146,160 @@ var name =place.name
 console.log(name)
 
 
+
+
 var directionsService = new google.maps.DirectionsService();
 
-var address ="小牧市小松寺2丁目52"
+
 directionsService.route({
-    origin:address,
+    origin:selectedplace,
     destination:name,
     travelMode:google.maps.DirectionsTravelMode.DRIVING,
-}, displayResults
+}, pushArray
+);
+
+addressInput =name
+selectedplace=name
+
+}
+
+
+
+
+function pushArray(response,status){
+var distance=response.routes[0].legs[0].distance.text;
+var duration=response.routes[0].legs[0].duration.text;
+console.log(distance)
+console.log(duration)
+
+
+
+
+
+
+
+var distandereplaced=distance.replace(',','.');
+var distances = parseFloat(distandereplaced);
+console.log(distances);
+totaldistance.push(distances);
+
+
+if(duration.includes('h')) {
+
+    var result= duration.search('h');
+    var search =result-1;
+    var hours =  duration.charAt(search);
+    var min =parseInt(hours);
+    var mints = min*60;
+    totalduration.push(mints);
+
+   
+    
+  
+
+}else{
+    var mints = parseInt(duration);
+    totalduration.push(mints);
+    
+  
+}
+
+console.log(mints)
+
+
+
+}
+
+
+
+
+
+
+
+function finalRoute(){
+
+
+
+
+var directionsService = new google.maps.DirectionsService();
+
+
+directionsService.route({
+    origin:selectedplace,
+    destination:destinationplace,
+    travelMode:google.maps.DirectionsTravelMode.DRIVING,
+}, finalDisplayResults
 );
 }
 
+ function finalDisplayResults(response,status){
 
-
-function displayResults(response,status){
-var distance=response.routes[0].legs[0].distance.text;
+ var distance=response.routes[0].legs[0].distance.text;
 var duration=response.routes[0].legs[0].duration.text;
 
-console.log(distance);
-console.log(duration);
-console.log(response);
+var distandereplaced=distance.replace(',','.');
+var distances = parseFloat(distandereplaced);
+totaldistance.push(distances);
+
+
+if(duration.includes('h')) {
+
+    var result= duration.search('h');
+    var search =result-1;
+    var hours =  duration.charAt(search);
+    var min =parseInt(hours);
+    var mints = min*60;
+    totalduration.push(mints);
 
 
 
+
+
+}else{
+    var mints = parseInt(duration);
+    totalduration.push(mints);
+    console.log(totalduration[0]);
 }
+
+var travelduration=sumArrayDuration(totalduration);
+
+
+var traveldistance=sumArrayDisutance(totaldistance);
+
+
+let words = '【総所要時間】'+travelduration+'\n'+'【総移動距離】'+traveldistance+'\n';
+
+document.getElementById("results").innerHTML =words
+
+
+
+ }
+
+
+
+ const sumArrayDuration = array => {
+  let sum = 0;
+  for (let i = 0, len = array.length; i < len; i++) {
+    var inidvisualtime=array[i]+60;
+    sum += inidivijuarltime
+  }
+  return sum;
+};
+
+
+
+const sumArrayDistance = array => {
+  let sum = 0;
+  for (let i = 0, len = array.length; i < len; i++) {
+    sum += array[i];
+  }
+  return sum;
+};
+
+
+
+
+
 
 
 </script>
