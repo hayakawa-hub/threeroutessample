@@ -31,7 +31,7 @@ var totaldistance=[]
 
 
 
-
+var flg = 0;
 
 window.onload=function route(){
 
@@ -52,12 +52,11 @@ selectedplace=content[0]
 
 
 
-  for(var i=0; i<content.length-1;i++){
-    if(i<content.length-2){
+for(var i=0; i<content.length;i++){
+    if(i<content.length-1){
       getPlaces();
     }else{
       finalRoute();
-
     }
   }
 }
@@ -79,7 +78,19 @@ function getPlaces(){
       address: addressInput
     },
     function(results, status) {
+
+      selectedplace=results[0].geometry.location.lat()+","+results[0].geometry.location.lng()
+
+      console.log(selectedplace)
+     
+
+
+
       if (status == google.maps.GeocoderStatus.OK) {
+
+  
+
+     
         //取得した緯度・経度を使って周辺検索
         startNearbySearch(results[0].geometry.location);
       }
@@ -87,6 +98,9 @@ function getPlaces(){
         alert(addressInput + "：位置情報が取得できませんでした。");
       }
     });
+
+   
+    
 }
 
 
@@ -144,8 +158,13 @@ for (var i = 0; i < placesList.length; i++) {
 
 var place = placesList[0];
 var name =place.name
-
 console.log(name)
+
+var lat=place.geometry.location.lat()
+var lng=place.geometry.location.lng()
+
+var latlng=place.geometry.location.lat()+","+place.geometry.location.lng()
+console.log(latlng)
 
 
 
@@ -155,13 +174,12 @@ var directionsService = new google.maps.DirectionsService();
 
 directionsService.route({
     origin:selectedplace,
-    destination:name,
+    destination:latlng,
     travelMode:google.maps.DirectionsTravelMode.DRIVING,
 }, pushArray
 );
 
 addressInput =name
-selectedplace=name
 
 }
 
@@ -207,7 +225,7 @@ if(duration.includes('h')) {
 }
 
 console.log(mints)
-
+if(flg==1) finalRoute();
 
 
 }
@@ -227,8 +245,8 @@ var directionsService = new google.maps.DirectionsService();
 
 
 directionsService.route({
-    origin:selectedplace,
-    destination:destinationplace,
+    origin:"35.309341,136.976972",
+    destination:"35.3102232,136.9466086",
     travelMode:google.maps.DirectionsTravelMode.DRIVING,
 }, finalDisplayResults
 );
