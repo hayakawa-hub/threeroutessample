@@ -20,8 +20,9 @@ var destinationplace="小牧市小松寺2丁目52番地"
 
 var counter = 1;
 
-var addressInput=0
-var selectedplace=0
+addressInput=content[0]
+
+var selectedplace=""
 
 var placesList=[]
 
@@ -31,7 +32,7 @@ var totaldistance=[]
 
 
 
-var flg = 0;
+
 
 window.onload=function route(){
 
@@ -39,15 +40,6 @@ window.onload=function route(){
 
 
 
-
-counter=1;
-totalduration= new Array();
-
-totaldistance= new Array();
-
-
-addressInput=content[0]
-selectedplace=content[0]
 
 
 
@@ -64,6 +56,7 @@ for(var i=0; i<content.length;i++){
 
 function getPlaces(){
   //結果表示クリア
+  console.log("--getPlaces----")
 
   document.getElementById("results").innerHTML = "";
   //placesList配列を初期化
@@ -81,9 +74,7 @@ function getPlaces(){
 
       selectedplace=results[0].geometry.location.lat()+","+results[0].geometry.location.lng()
 
-      console.log(selectedplace)
      
-
 
 
       if (status == google.maps.GeocoderStatus.OK) {
@@ -106,6 +97,8 @@ function getPlaces(){
 
 
 function startNearbySearch(latLng){
+  console.log("--getPlaces----")
+
   
   //読み込み中表示
   document.getElementById("results").innerHTML = "Now Loading...";
@@ -120,7 +113,6 @@ function startNearbySearch(latLng){
   
   //入力したKeywordを取得
   var keywordInput = content[counter];
-  console.log(keywordInput)
 
 
   counter+=1
@@ -142,6 +134,8 @@ function startNearbySearch(latLng){
 
 function getRoute(results,status){
 
+  console.log("--getPlaces----")
+
 placesList = placesList.concat(results);
 
 for (var i = 0; i < placesList.length; i++) {
@@ -158,13 +152,13 @@ for (var i = 0; i < placesList.length; i++) {
 
 var place = placesList[0];
 var name =place.name
-console.log(name)
+
 
 var lat=place.geometry.location.lat()
 var lng=place.geometry.location.lng()
 
 var latlng=place.geometry.location.lat()+","+place.geometry.location.lng()
-console.log(latlng)
+
 
 
 
@@ -187,10 +181,11 @@ addressInput =name
 
 
 function pushArray(response,status){
+  console.log("--getPlaces----")
+
 var distance=response.routes[0].legs[0].distance.text;
 var duration=response.routes[0].legs[0].duration.text;
-console.log(distance)
-console.log(duration)
+
 
 
 
@@ -200,7 +195,6 @@ console.log(duration)
 
 var distandereplaced=distance.replace(',','.');
 var distances = parseFloat(distandereplaced);
-console.log(distances);
 totaldistance.push(distances);
 
 
@@ -224,9 +218,6 @@ if(duration.includes('h')) {
   
 }
 
-console.log(mints)
-if(flg==1) finalRoute();
-
 
 }
 
@@ -238,8 +229,7 @@ if(flg==1) finalRoute();
 
 function finalRoute(){
 
-console.log(totalduration)
-console.log(totaldistance)
+  console.log("--finalroute----")
 
 var directionsService = new google.maps.DirectionsService();
 
@@ -253,6 +243,8 @@ directionsService.route({
 }
 
  function finalDisplayResults(response,status){
+  console.log("--finalroute----")
+
 
  var distance=response.routes[0].legs[0].distance.text;
 var duration=response.routes[0].legs[0].duration.text;
@@ -278,7 +270,7 @@ if(duration.includes('h')) {
 }else{
     var mints = parseInt(duration);
     totalduration.push(mints);
-    console.log(totalduration[0]);
+   
 }
 
 var travelduration=sumArrayDuration(totalduration);
