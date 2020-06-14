@@ -97,7 +97,7 @@ function getPlaces(){
 
 
 function startNearbySearch(latLng){
-  console.log("--getPlaces----")
+  console.log("--startNearbySearch----")
 
   
   //読み込み中表示
@@ -134,7 +134,7 @@ function startNearbySearch(latLng){
 
 function getRoute(results,status){
 
-  console.log("--getPlaces----")
+  console.log("--getRoute----")
 
 placesList = placesList.concat(results);
 
@@ -181,7 +181,7 @@ addressInput =name
 
 
 function pushArray(response,status){
-  console.log("--getPlaces----")
+  console.log("--pushArray----")
 
 var distance=response.routes[0].legs[0].distance.text;
 var duration=response.routes[0].legs[0].duration.text;
