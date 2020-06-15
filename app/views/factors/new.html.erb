@@ -14,7 +14,7 @@
 
 <script type="text/javascript">
 
-var content =["小牧市小松寺2丁目52番地","映画館","ファミリーレストラン","小牧市小松寺2丁目52"]
+var content =["小牧市小松寺2丁目52番地","映画館","中華料理","小牧市小松寺2丁目52"]
 
 var destinationplace="小牧市小松寺2丁目52番地"
 
@@ -32,25 +32,29 @@ var totaldistance=[]
 
 
 
+var count = 0;
 
-
-window.onload=function route(){
-
-
-
-
-
-
-
-
-  for(var i=0; i<content.length-1;i++){
-    if(i<content.length-2){
-      getPlaces();
-    }else{
-      finalRoute();
-
-    }
+window.onload = function route() {
+    setTimeout("count1()",500);
   }
+
+
+
+
+
+
+  function count1(){
+
+    if (count < content.length - 2) {
+      getPlaces();
+    } else {
+      finalRoute();
+    }
+  count++;
+  if(count != content.length-1){
+  setTimeout("count1()",500);
+  }
+
 }
 
 
@@ -62,7 +66,8 @@ function getPlaces(){
   //placesList配列を初期化
   placesList = new Array();
   
-
+ console.log("シャケ")
+ 
   
   //検索場所の位置情報を取得
   var geocoder = new google.maps.Geocoder();
@@ -72,7 +77,12 @@ function getPlaces(){
     },
     function(results, status) {
 
+    
+    console.log("昆布")
+
       selectedplace=results[0].geometry.location.lat()+","+results[0].geometry.location.lng()
+
+      console.log(selectedplace)
 
      
 
@@ -93,6 +103,8 @@ function getPlaces(){
    
     
 }
+
+
 
 
 
@@ -174,6 +186,7 @@ directionsService.route({
 );
 
 addressInput =name
+selectedplace=selectedplace
 
 }
 
@@ -231,11 +244,16 @@ function finalRoute(){
 
   console.log("--finalroute----")
 
+  var selectedplace=lastGeocode(addressInput)
+  
+  
+  
+
 var directionsService = new google.maps.DirectionsService();
 
 
 directionsService.route({
-    origin:"35.309341,136.976972",
+    origin:"35.329816,136.669575",
     destination:"35.3102232,136.9466086",
     travelMode:google.maps.DirectionsTravelMode.DRIVING,
 }, finalDisplayResults
@@ -243,8 +261,9 @@ directionsService.route({
 }
 
  function finalDisplayResults(response,status){
-  console.log("--finalroute----")
 
+ console.log("--finalDisplayResults---")
+  
 
  var distance=response.routes[0].legs[0].distance.text;
 var duration=response.routes[0].legs[0].duration.text;
@@ -308,6 +327,31 @@ const sumArrayDisutance = array => {
   return sum;
 };
 
+
+function lastGeocode(addressInput){
+
+   console.log(addressInput)
+
+
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode(
+    {
+      address:addressInput
+    },
+    function(results) {  
+
+
+
+
+   var lastselectedplace=results[0].geometry.location.lat()+","+results[0].geometry.location.lng();
+　　　
+      
+     
+    });
+  
+  
+
+}
 
 
 
