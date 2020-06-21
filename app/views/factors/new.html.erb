@@ -1,14 +1,14 @@
-<div>
-
-6/14 朝異常はないけど変数がうまくいっていない
-  
 ★結果★<br />
+
+小牧市の住所だけ取れたやつ
+
+serachPlaceの初期段階
 <div id="results" style="width: 100%; height: 200px; border: 1px dotted; padding: 10px; overflow-y: scroll;"></div>
 </div>
 
 <%= link_to '一覧へ戻る', '/factors'%>
 
-
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJzux1JhQNtBO-9TNu2fNp2hzzJOcyln8&libraries=places"></script>
 
 
 
@@ -16,141 +16,69 @@
 
 var content =["小牧市小松寺2丁目52番地","映画館","中華料理","小牧市小松寺2丁目52"]
 
-var destinationplace="小牧市小松寺2丁目52番地"
 
-var counter = 1;
-
-addressInput=content[0]
-
-var selectedplace=""
-
-var placesList=[]
-
+var count = 0;
+var totalname=[]
 var totalduration=[]
 var totaldistance=[]
 
 
+var place1 =""
+var place2 =""
+var place3 =""
+var place4 =""
 
+//全体の状況を管理する関数、place4まで代入されたらcreateを実行する
+window.onload=function count1(){
+  searchPlace("小牧市小松寺2丁目５２番地",function(results,status){
+    place1 = results[0].geometry.location.lat()+","+results[0].geometry.location.lng()
+    place4= results[0].geometry.location.lat()+","+results[0].geometry.location.lng()
+    console.log(place1)
 
-var count = 0;
+    searchNearby(place1,content[1],function(){
 
-window.onload = function route() {
-    setTimeout("count1()",500);
-  }
+    console.log("searchNearbyが動いているのかのテスト")
 
-
-
-
-
-
-  function count1(){
-
-    if (count < content.length - 2) {
-      getPlaces();
-    } else {
-      finalRoute();
-    }
-  count++;
-  if(count != content.length-1){
-  setTimeout("count1()",500);
-  }
-
-}
-
-
-function getPlaces(){
-  //結果表示クリア
-  console.log("--getPlaces----")
-
-  document.getElementById("results").innerHTML = "";
-  //placesList配列を初期化
-  placesList = new Array();
-  
- console.log("シャケ")
- 
-  
-  //検索場所の位置情報を取得
-  var geocoder = new google.maps.Geocoder();
-  geocoder.geocode(
-    {
-      address: addressInput
-    },
-    function(results, status) {
-
-    
-    console.log("昆布")
-
-      selectedplace=results[0].geometry.location.lat()+","+results[0].geometry.location.lng()
-
-      console.log(selectedplace)
-
-     
-
-
-      if (status == google.maps.GeocoderStatus.OK) {
-
-  
-
-     
-        //取得した緯度・経度を使って周辺検索
-        startNearbySearch(results[0].geometry.location);
-      }
-      else {
-        alert(addressInput + "：位置情報が取得できませんでした。");
-      }
-    });
-
-   
-    
+    })
+  })
 }
 
 
 
 
 
-function startNearbySearch(latLng){
-  console.log("--startNearbySearch----")
 
-  
-  //読み込み中表示
+
+//二番めの小牧市の住所を元に近くのお店を検索する関数
+function searchNearby(latLng,keywordInput,callback){
+
+
   document.getElementById("results").innerHTML = "Now Loading...";
-  
-  //Mapインスタンス生成
+
   var map = new google.maps.Map(
     document.createElement("div")
   );
-  
-  //PlacesServiceインスタンス生成
+
   var service = new google.maps.places.PlacesService(map);
-  
-  //入力したKeywordを取得
-  var keywordInput = content[counter];
 
-
-  counter+=1
-  
-  //周辺検索
   service.nearbySearch(
     {
-      location: latLng,
+      location:latLng,
       radius: 5000,
       keyword: keywordInput,
       
     },
-    getRoute
+    callback
   );
 }
 
 
+//二番めの小牧市の住所を元に近くのお店を検索する関数のコールバック関数
+function create2(results,status){
+  console.log(status)
+  placesList = placesList.concat(results);
 
-
-function getRoute(results,status){
-
-  console.log("--getRoute----")
-
-placesList = placesList.concat(results);
-
-for (var i = 0; i < placesList.length; i++) {
+  for (var i = 0; i < placesList.length; i++) {
     if(placesList[i].rating == undefined){
       placesList[i].rating = -1;
     }
@@ -162,197 +90,26 @@ for (var i = 0; i < placesList.length; i++) {
     return 0;
   });
 
-var place = placesList[0];
-var name =place.name
 
+  var place = placesList[0];
 
-var lat=place.geometry.location.lat()
-var lng=place.geometry.location.lng()
+  var lat=place.geometry.location.lat()
+  var lng=place.geometry.location.lng()
 
-var latlng=place.geometry.location.lat()+","+place.geometry.location.lng()
-
-
-
-
-
-var directionsService = new google.maps.DirectionsService();
-
-
-directionsService.route({
-    origin:selectedplace,
-    destination:latlng,
-    travelMode:google.maps.DirectionsTravelMode.DRIVING,
-}, pushArray
-);
-
-addressInput =name
-selectedplace=selectedplace
-
-}
-
-
-
-
-function pushArray(response,status){
-  console.log("--pushArray----")
-
-var distance=response.routes[0].legs[0].distance.text;
-var duration=response.routes[0].legs[0].duration.text;
-
-
-
-
-
-
-
-
-var distandereplaced=distance.replace(',','.');
-var distances = parseFloat(distandereplaced);
-totaldistance.push(distances);
-
-
-if(duration.includes('h')) {
-
-    var result= duration.search('h');
-    var search =result-1;
-    var hours =  duration.charAt(search);
-    var min =parseInt(hours);
-    var mints = min*60;
-    totalduration.push(mints);
-
-   
-    
-  
-
-}else{
-    var mints = parseInt(duration);
-    totalduration.push(mints);
-    
-  
-}
+  place2==place.geometry.location.lat()+","+place.geometry.location.lng()
+  count++
+  checkFinish();
+  console.log(place2)
 
 
 }
 
 
-
-
-
-
-
-function finalRoute(){
-
-  console.log("--finalroute----")
-
-  var selectedplace=lastGeocode(addressInput)
-  
-  
-  
-
-var directionsService = new google.maps.DirectionsService();
-
-
-directionsService.route({
-    origin:"35.329816,136.669575",
-    destination:"35.3102232,136.9466086",
-    travelMode:google.maps.DirectionsTravelMode.DRIVING,
-}, finalDisplayResults
-);
+//始めの小牧市の住所を取得するための関数
+function searchPlace(addressInput, callback){
+var geocoder = new google.maps.Geocoder();
+geocoder.geocode({address:addressInput}, callback);
 }
-
- function finalDisplayResults(response,status){
-
- console.log("--finalDisplayResults---")
-  
-
- var distance=response.routes[0].legs[0].distance.text;
-var duration=response.routes[0].legs[0].duration.text;
-
-var distandereplaced=distance.replace(',','.');
-var distances = parseFloat(distandereplaced);
-totaldistance.push(distances);
-
-
-if(duration.includes('h')) {
-
-    var result= duration.search('h');
-    var search =result-1;
-    var hours =  duration.charAt(search);
-    var min =parseInt(hours);
-    var mints = min*60;
-    totalduration.push(mints);
-
-
-
-
-
-}else{
-    var mints = parseInt(duration);
-    totalduration.push(mints);
-   
-}
-
-var travelduration=sumArrayDuration(totalduration);
-
-
-var traveldistance=sumArrayDisutance(totaldistance);
-
-
-let words = '【総所要時間】'+travelduration+'\n'+'【総移動距離】'+traveldistance+'\n';
-
-document.getElementById("results").innerHTML =words
-
-
-
- }
-
-
-
- const sumArrayDuration = array => {
-  let sum = 0;
-  for (let i = 0, len = array.length; i < len; i++) {
-    var inidvisualtime=array[i]+60;
-    sum += inidvisualtime
-  }
-  return sum;
-};
-
-
-
-const sumArrayDisutance = array => {
-  let sum = 0;
-  for (let i = 0, len = array.length; i < len; i++) {
-    sum += array[i];
-  }
-  return sum;
-};
-
-
-function lastGeocode(addressInput){
-
-   console.log(addressInput)
-
-
-  var geocoder = new google.maps.Geocoder();
-  geocoder.geocode(
-    {
-      address:addressInput
-    },
-    function(results) {  
-
-
-
-
-   var lastselectedplace=results[0].geometry.location.lat()+","+results[0].geometry.location.lng();
-　　　
-      
-     
-    });
-  
-  
-
-}
-
 
 
 
